@@ -28,6 +28,7 @@ use Sonata\UserBundle\Tests\Entity\User;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -53,6 +54,7 @@ final class AppKernel extends Kernel
             new TwigBundle(),
             new SecurityBundle(),
             new DoctrineBundle(),
+            new SwiftmailerBundle(),
             new FOSUserBundle(),
             new FOSRestBundle(),
             new JMSSerializerBundle(),
@@ -82,16 +84,21 @@ final class AppKernel extends Kernel
 
     protected function configureRoutes(RouteCollectionBuilder $routes): void
     {
-        $routes->import($this->getProjectDir().'/config/routes.yml');
+        $routes->add('/api/doc', null, 'app.swagger_ui')
+            ->addDefaults(['_controller' => 'nelmio_api_doc.controller.swagger_ui'])
+            ->setMethods(['GET'])
+        ;
+
+        $routes->add('/api/doc.json', null, 'app.swagger')
+            ->addDefaults(['_controller' => 'nelmio_api_doc.controller.swagger'])
+            ->setMethods(['GET'])
+        ;
+
+        $routes->import('@SonataUserBundle/Resources/config/routing/api.xml', '/api/user');
     }
 
     protected function configureContainer(ContainerBuilder $containerBuilder, LoaderInterface $loader): void
     {
-        $containerBuilder->register('templating')->setSynthetic(true);
-        $containerBuilder->register('templating.locator')->setSynthetic(true);
-        $containerBuilder->register('templating.name_parser')->setSynthetic(true);
-        $containerBuilder->register('mailer')->setSynthetic(true);
-
         $containerBuilder->loadFromExtension('framework', [
             'secret' => '50n474.U53r',
             'session' => [
