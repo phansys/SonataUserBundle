@@ -161,7 +161,22 @@ final class AppKernel extends Kernel
         ]);
 
         $containerBuilder->loadFromExtension('fos_rest', [
+            'format_listener' => [
+                'enabled' => true,
+                'rules' => [
+                    [
+                        'priorities' => [
+                            'json',
+                        ],
+                        'fallback_format' => 'json',
+                        'prefer_extension' => false,
+                    ],
+                ],
+            ],
             'param_fetcher_listener' => true,
+            'view' => [
+                'view_response_listener' => true,
+            ],
         ]);
     }
 
