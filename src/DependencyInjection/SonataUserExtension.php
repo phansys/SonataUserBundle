@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Sonata\UserBundle\DependencyInjection;
 
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Sonata\EasyExtendsBundle\Mapper\DoctrineCollector;
 use Sonata\UserBundle\Document\BaseGroup as DocumentGroup;
 use Sonata\UserBundle\Document\BaseUser as DocumentUser;
@@ -91,7 +92,11 @@ class SonataUserExtension extends Extension implements PrependExtensionInterface
             $loader->load('serializer.xml');
 
             $loader->load('api_form.xml');
-            $loader->load('api_controllers.xml');
+            if (class_exists(ApiDoc::class)) {
+                $loader->load('api_controllers.xml');
+            } else {
+                $loader->load('api_nelmio_3_controllers.xml');
+            }
         }
 
         if ($config['security_acl']) {
